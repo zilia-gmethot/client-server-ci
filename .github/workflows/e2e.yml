@@ -44,6 +44,7 @@ jobs:
           cache: "pip"
       - name: Install server dependencies
         run: |
+          cd server
           pip install -r requirements.txt
       # - name: Launch client
       #   run: |
