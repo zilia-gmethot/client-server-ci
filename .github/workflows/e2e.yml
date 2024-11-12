@@ -76,24 +76,24 @@ jobs:
       - name: Update status check for client (success)
         if: success()
         run: |
-          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          curl -X POST -H "Authorization: token ${{ secrets.UPDATE_COMMIT_STATUS_TOKEN }}" \
           -d '{"state": "success", "description": "E2E tests passed", "context": "E2E Tests"}' \
           https://api.github.com/repos/zilia-gmethot/client-app/statuses/${{ env.CLIENT_COMMIT }}
       - name: Update status check for server (success)
         if: success()
         run: |
-          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          curl -X POST -H "Authorization: token ${{ secrets.UPDATE_COMMIT_STATUS_TOKEN }}" \
           -d '{"state": "success", "description": "E2E tests passed", "context": "E2E Tests"}' \
           https://api.github.com/repos/zilia-gmethot/server-app/statuses/${{ env.SERVER_COMMIT }}
       - name: Update status check for client (failure)
         if: failure()
         run: |
-          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          curl -X POST -H "Authorization: token ${{ secrets.UPDATE_COMMIT_STATUS_TOKEN }}" \
           -d '{"state": "failure", "description": "E2E tests failed", "context": "E2E Tests"}' \
           https://api.github.com/repos/zilia-gmethot/client-app/statuses/${{ env.CLIENT_COMMIT }}
       - name: Update status check for server (failure)
         if: failure()
         run: |
-          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          curl -X POST -H "Authorization: token ${{ secrets.UPDATE_COMMIT_STATUS_TOKEN }}" \
           -d '{"state": "failure", "description": "E2E tests failed", "context": "E2E Tests"}' \
           https://api.github.com/repos/zilia-gmethot/server-app/statuses/${{ env.SERVER_COMMIT }}
