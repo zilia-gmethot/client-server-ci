@@ -9,18 +9,6 @@ jobs:
       group: ${{ github.event.client_payload.client_commit }}-${{ github.event.client_payload.server_commit }}
       cancel-in-progress: true
     steps:
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: "npm"
-          cache-dependency-path: "client"
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-          cache: "pip"
-          cache-dependency-path: "server"
       - name: Checkout client repository
         uses: actions/checkout@v4
         with:
@@ -33,6 +21,18 @@ jobs:
           repository: zilia-gmethot/server-app
           ref: ${{ github.event.client_payload.server_commit }}
           path: server
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: "npm"
+          cache-dependency-path: "client"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+          cache-dependency-path: "server"
       - name: Install client dependencies
         run: |
           cd client
