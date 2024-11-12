@@ -14,6 +14,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
+          cache: "npm"
+          cache-dependency-path: "client"
       - name: Install client dependencies
         run: |
           cd client
