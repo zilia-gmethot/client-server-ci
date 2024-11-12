@@ -28,7 +28,8 @@ jobs:
   setup-server:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout server repository
+        uses: actions/checkout@v4
         with:
           repository: zilia-gmethot/server-app
           ref: ${{ github.event.client_payload.server_commit }}
@@ -46,19 +47,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [setup-client, setup-server]
     steps:
-      - uses: actions/checkout@v4
-      - name: Checkout client repository
-        uses: actions/checkout@v4
-        with:
-          repository: zilia-gmethot/client-app
-          ref: ${{ github.event.client_payload.client_commit }}
-          path: client
-      - name: Checkout server repository
-        uses: actions/checkout@v4
-        with:
-          repository: zilia-gmethot/server-app
-          ref: ${{ github.event.client_payload.server_commit }}
-          path: server
       - name: Launch server
         run: |
           cd server
