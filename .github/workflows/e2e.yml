@@ -1,5 +1,15 @@
 name: E2E Tests
 on:
+  workflow_dispatch:
+    inputs:
+      client_commit:
+        description: "Client commit"
+        required: true
+        default: "master"
+      server_commit:
+        description: "Server commit"
+        required: true
+        default: "master"
   repository_dispatch:
     types: [e2e]
 jobs:
@@ -13,13 +23,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: zilia-gmethot/client-app
-          ref: ${{ github.event.client_payload.client_commit }}
+          ref: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.client_commit || github.event.inputs.client_commit }}
           path: client
       - name: Checkout server repository
         uses: actions/checkout@v4
         with:
           repository: zilia-gmethot/server-app
-          ref: ${{ github.event.client_payload.server_commit }}
+          ref: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.server_commit || github.event.inputs.server_commit }}
           path: server
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -60,27 +70,27 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-      # - name: Update status check for client (success)
-      #   if: success()
-      #   run: |
-      #     curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-      #     -d '{"state": "success", "description": "E2E tests passed", "context": "E2E Tests"}' \
-      #     https://api.github.com/repos/zilia-gmethot/client-app/statuses/${{ github.event.client_payload.client_commit }}
-      # - name: Update status check for server (success)
-      #   if: success()
-      #   run: |
-      #     curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-      #     -d '{"state": "success", "description": "E2E tests passed", "context": "E2E Tests"}' \
-      #     https://api.github.com/repos/zilia-gmethot/server-app/statuses/${{ github.event.client_payload.server_commit }}
-      # - name: Update status check for client (failure)
-      #   if: failure()
-      #   run: |
-      #     curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-      #     -d '{"state": "failure", "description": "E2E tests failed", "context": "E2E Tests"}' \
-      #     https://api.github.com/repos/zilia-gmethot/client-app/statuses/${{ github.event.client_payload.client_commit }}
-      # - name: Update status check for server (failure)
-      #   if: failure()
-      #   run: |
-      #     curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-      #     -d '{"state": "failure", "description": "E2E tests failed", "context": "E2E Tests"}' \
-      #     https://api.github.com/repos/zilia-gmethot/server-app/statuses/${{ github.event.client_payload.server_commit }}
+      - name: Update status check for client (success)
+        if: success()
+        run: |
+          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -d '{"state": "success", "description": "E2E tests passed", "context": "E2E Tests"}' \
+          https://api.github.com/repos/zilia-gmethot/client-app/statuses/${{ github.event.client_payload.client_commit }}
+      - name: Update status check for server (success)
+        if: success()
+        run: |
+          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -d '{"state": "success", "description": "E2E tests passed", "context": "E2E Tests"}' \
+          https://api.github.com/repos/zilia-gmethot/server-app/statuses/${{ github.event.client_payload.server_commit }}
+      - name: Update status check for client (failure)
+        if: failure()
+        run: |
+          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -d '{"state": "failure", "description": "E2E tests failed", "context": "E2E Tests"}' \
+          https://api.github.com/repos/zilia-gmethot/client-app/statuses/${{ github.event.client_payload.client_commit }}
+      - name: Update status check for server (failure)
+        if: failure()
+        run: |
+          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -d '{"state": "failure", "description": "E2E tests failed", "context": "E2E Tests"}' \
+          https://api.github.com/repos/zilia-gmethot/server-app/statuses/${{ github.event.client_payload.server_commit }}
