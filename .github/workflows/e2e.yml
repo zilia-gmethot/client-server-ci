@@ -1,0 +1,69 @@
+name: Run E2E tests
+on:
+  push:
+    branches: [feature/setup-pipeline]
+  repository_dispatch:
+    types: [e2e]
+
+jobs:
+  e2e:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.event.client_payload.client_commit }}-${{ github.event.client_payload.server_commit }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout client repository
+        uses: actions/checkout@v4
+        with:
+          repository: zilia-gmethot/client-app
+          ref: ${{ github.event.client_payload.client_commit }}
+          path: client
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Install client dependencies
+        run: |
+          cd client
+          npm ci
+          npx playwright install --with-deps
+      - name: Build client
+        run: |
+          cd client
+          npm run build
+      - name: Checkout server repository
+        uses: actions/checkout@v4
+        with:
+          repository: zilia-gmethot/server-app
+          ref: ${{ github.event.client_payload.server_commit }}
+          path: server
+      # - name: Launch client
+      #   run: |
+      #     cd client
+      #     node serve-build.mjs &
+      - name: Launch server
+        run: |
+          cd server
+          fastapi dev src/main.py &
+      - name: Run Playwright tests
+        run: |
+          cd client
+          npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+      # - name: Update status check for repo1
+      #   if: success()
+      #   run: |
+      #     curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+      #     -d '{"state": "success", "description": "E2E tests passed", "context": "E2E Tests"}' \
+      #     https://api.github.com/repos/owner/repo1/statuses/${{ github.event.client_payload.client_commit }}
+      # - name: Update status check for repo2
+      #   if: success()
+      #   run: |
+      #     curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+      #     -d '{"state": "success", "description": "E2E tests passed", "context": "E2E Tests"}' \
+      #     https://api.github.com/repos/owner/repo2/statuses/${{ github.event.client_payload.server_commit }}
