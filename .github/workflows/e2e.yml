@@ -32,6 +32,16 @@ jobs:
 
           echo "CLIENT_COMMIT_SHA=$client_commit_sha" >> $GITHUB_ENV
           echo "SERVER_COMMIT_SHA=$server_commit_sha" >> $GITHUB_ENV
+      - name: Update commit status for client (pending)
+        run: |
+          curl -X POST -H "Authorization: token ${{ secrets.UPDATE_COMMIT_STATUS_TOKEN }}" \
+          -d '{"state": "pending", "description": "Running E2E tests", "context": "E2E Tests"}' \
+          https://api.github.com/repos/zilia-gmethot/client-app/statuses/$CLIENT_COMMIT_SHA
+      - name: Update commit status for server (pending)
+        run: |
+          curl -X POST -H "Authorization: token ${{ secrets.UPDATE_COMMIT_STATUS_TOKEN }}" \
+          -d '{"state": "pending", "description": "Running E2E tests", "context": "E2E Tests"}' \
+          https://api.github.com/repos/zilia-gmethot/server-app/statuses/$SERVER_COMMIT_SHA
       - name: Checkout client repository
         uses: actions/checkout@v4
         with:
@@ -83,25 +93,25 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-      - name: Update status check for client (success)
+      - name: Update commit status for client (success)
         if: success()
         run: |
           curl -X POST -H "Authorization: token ${{ secrets.UPDATE_COMMIT_STATUS_TOKEN }}" \
           -d '{"state": "success", "description": "E2E tests passed", "context": "E2E Tests"}' \
           https://api.github.com/repos/zilia-gmethot/client-app/statuses/$CLIENT_COMMIT_SHA
-      - name: Update status check for server (success)
+      - name: Update commit status for server (success)
         if: success()
         run: |
           curl -X POST -H "Authorization: token ${{ secrets.UPDATE_COMMIT_STATUS_TOKEN }}" \
           -d '{"state": "success", "description": "E2E tests passed", "context": "E2E Tests"}' \
           https://api.github.com/repos/zilia-gmethot/server-app/statuses/$SERVER_COMMIT_SHA
-      - name: Update status check for client (failure)
+      - name: Update commit status for client (failure)
         if: failure()
         run: |
           curl -X POST -H "Authorization: token ${{ secrets.UPDATE_COMMIT_STATUS_TOKEN }}" \
           -d '{"state": "failure", "description": "E2E tests failed", "context": "E2E Tests"}' \
           https://api.github.com/repos/zilia-gmethot/client-app/statuses/$CLIENT_COMMIT_SHA
-      - name: Update status check for server (failure)
+      - name: Update commit status for server (failure)
         if: failure()
         run: |
           curl -X POST -H "Authorization: token ${{ secrets.UPDATE_COMMIT_STATUS_TOKEN }}" \
