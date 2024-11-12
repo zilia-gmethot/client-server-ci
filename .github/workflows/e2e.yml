@@ -16,7 +16,7 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.event.client_payload.client_commit }}-${{ github.event.client_payload.server_commit }}
+      group: ${{ github.event.client_payload.client_commit || github.event.inputs.client_commit }}-${{ github.event.client_payload.server_commit || github.event.inputs.server_commit }}
       cancel-in-progress: true
     env:
       CLIENT_COMMIT: ${{ github.event.client_payload.client_commit || github.event.inputs.client_commit }}
