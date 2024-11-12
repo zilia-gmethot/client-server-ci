@@ -1,7 +1,7 @@
 name: E2E Tests
 on:
-  push:
-    branches: [feature/setup-pipeline]
+  repository_dispatch:
+    types: [e2e]
 jobs:
   e2e:
     runs-on: ubuntu-latest
